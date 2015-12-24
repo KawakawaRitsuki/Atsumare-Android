@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.github.scribejava.apis.TwitterApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.Token;
+import com.github.scribejava.core.oauth.OAuthService;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 
@@ -86,6 +91,23 @@ public class LoginActivity extends AppCompatActivity {
         sequence.start();
     }
 
+    @OnClick(R.id.twitterLoginBtn)
+    public void twitterBtn(View v){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OAuthService service = new ServiceBuilder()
+                        .provider(TwitterApi.class)
+                        .apiKey("358zlvIfDNu4RnrXNJMC47mZr")
+                        .apiSecret("VL9FQkVpttzcIPxifChjabwnqTXIcvtYKI9hul3hNQNfDkS69O")
+                        .build();
+                Token requestToken = service.getRequestToken();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(service.getAuthorizationUrl(requestToken)));
+                startActivity(intent);
+            }
+        }).start();
+
+    }
     @OnClick(R.id.signUpBtn)
     public void signUpBtn() {
         mVib.vibrate(50);
