@@ -42,16 +42,19 @@ public class WaitGroupFragment  extends Fragment {
 
     private String mGroupId;
     private String mMyId;
-    public static final String TAG = "WaitGroupFragment";
-    
+
     private Handler mHandler;
     private SharedPreferences mPref;
+    private Timer mTimer;
+    private WaitMemberAdapter mWaitMemberAdapter;
+    private List<WaitMemberData> mWmdList;
+
+    public static final String TAG = "WaitGroupFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_group_wait, container, false);
         ButterKnife.bind(this, v);
-
         return v;
     }
 
@@ -61,35 +64,18 @@ public class WaitGroupFragment  extends Fragment {
 
         mPref = getActivity().getSharedPreferences("loginmPref", Activity.MODE_PRIVATE);
         mHandler = new Handler();
-        setWaitScreenContent();
-    }
+        mWmdList = new ArrayList<>();
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        mTimer.cancel();
-    }
-
-    private Timer mTimer;
-    WaitMemberAdapter customAdapter;
-    private void setWaitScreenContent() {
-
-        objects = new ArrayList<>();
-
-
-        mTimer=null;
+        mTimer = null;
         mTimer = new Timer();
 
-        if(customAdapter != null) {
-            customAdapter.clear();
-            customAdapter.notifyDataSetChanged();
-            mWaitLv.setAdapter(customAdapter);
+        if(mWaitMemberAdapter != null) {
+            mWaitMemberAdapter.clear();
+            mWaitMemberAdapter.notifyDataSetChanged();
+            mWaitLv.setAdapter(mWaitMemberAdapter);
         }
 
-
-
         mHandler.post(() -> firstCheck(mGroupId));
-
 
         HttpConnector httpConnector = new HttpConnector("grouplogin","{\"user_id\":\""+mMyId+"\",\"group_id\":\""+mGroupId+"\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
@@ -98,12 +84,20 @@ public class WaitGroupFragment  extends Fragment {
             }
         });
         httpConnector.post();
-
     }
-    List<WaitMemberData> objects;
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mTimer.cancel();
+    }
+
     public void firstCheck(String mGroupId){
         HttpConnector httpConnector = new HttpConnector("loginstate","{\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
+
+            if(isDetached() || getActivity() == null)return;
+
             Bitmap successImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
             Bitmap errorImage = BitmapFactory.decodeResource(getResources(), R.drawable.error);
 
@@ -124,10 +118,10 @@ public class WaitGroupFragment  extends Fragment {
                     }
 
                     item.setTextData(object.getString("user_name") + "(" + object.getString("user_id") + ")");
-                    objects.add(item);
+                    mWmdList.add(item);
                 }
-                customAdapter = new WaitMemberAdapter(getActivity(),0,objects);
-                mWaitLv.setAdapter(customAdapter);//変更部分
+                mWaitMemberAdapter = new WaitMemberAdapter(getActivity(),0, mWmdList);
+                mWaitLv.setAdapter(mWaitMemberAdapter);//変更部分
                 if(json.getInt("using") == 0 || flag){
                     HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
                     http.post();
@@ -186,6 +180,9 @@ public class WaitGroupFragment  extends Fragment {
     public void loginCheck(String mGroupId){
         HttpConnector httpConnector = new HttpConnector("loginstate","{\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
+
+            if(isDetached() || getActivity() == null)return;
+
             Bitmap successImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
             Bitmap errorImage = BitmapFactory.decodeResource(getResources(), R.drawable.error);
 
@@ -197,7 +194,7 @@ public class WaitGroupFragment  extends Fragment {
                 for (int i = 0; i != data.length(); i++) {
 
                     JSONObject object = data.getJSONObject(i);
-                    WaitMemberData wmd = customAdapter.getItem(i);
+                    WaitMemberData wmd = mWaitMemberAdapter.getItem(i);
                     if(object.getString("login_now").equals(mGroupId)) {
                         wmd.setImagaData(successImage);
 
@@ -206,7 +203,7 @@ public class WaitGroupFragment  extends Fragment {
                         flag=false;
                     }
 
-                    objects.set(i, wmd);
+                    mWmdList.set(i, wmd);
                 }
                 if(json.getInt("using") == 0 || flag){
                     HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
@@ -223,7 +220,7 @@ public class WaitGroupFragment  extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            customAdapter.notifyDataSetChanged();
+            mWaitMemberAdapter.notifyDataSetChanged();
 
         });
         httpConnector.post();
