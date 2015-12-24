@@ -70,7 +70,7 @@ public class SelectGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPref = getActivity().getSharedPreferences("loginpref", Activity.MODE_MULTI_PROCESS);
+        mPref = getActivity().getSharedPreferences("loginpref", Activity.MODE_PRIVATE);
         mMyId = mPref.getString("loginid", "");
         mHandler = new Handler();
 
@@ -132,13 +132,11 @@ public class SelectGroupFragment extends Fragment {
 
     private AdapterView.OnItemClickListener onItem = (AdapterView<?> parent, View view, int position, long id) -> {
         Map<String, String> map = (Map<String, String>) parent.getAdapter().getItem(position);
-//        groupId = map.get("Member").substring(7);
-        //画面遷移処理入れる
         FragmentManager fragmentManager = getActivity().getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(null);
 
-        WaitGroupFragment fragment1 = new WaitGroupFragment();
+        Fragment fragment1 = WaitGroupFragment.newInstance(map.get("Member").substring(7),mMyId);
         fragmentTransaction.replace(android.R.id.content, fragment1);
         fragmentTransaction.commit();
     };

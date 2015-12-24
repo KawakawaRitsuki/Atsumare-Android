@@ -415,7 +415,7 @@ public class SelectGroupActivity extends AppCompatActivity {
     private Timer mTimer;
     WaitMemberAdapter customAdapter;
     private void setWaitScreenContent() {
-        mWaitLv = (ListView)findViewById(R.id.listView);
+        mWaitLv = (ListView)findViewById(R.id.waitLv);
 
         objects = new ArrayList<>();
 
