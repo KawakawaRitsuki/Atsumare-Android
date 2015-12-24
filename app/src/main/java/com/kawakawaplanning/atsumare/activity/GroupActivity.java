@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare;
+package com.kawakawaplanning.atsumare.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
-import com.kawakawaplanning.atsumare.Fragment.SelectGroupFragment;
+import com.kawakawaplanning.atsumare.R;
+import com.kawakawaplanning.atsumare.fragment.SelectGroupFragment;
 
 public class GroupActivity extends AppCompatActivity {
 

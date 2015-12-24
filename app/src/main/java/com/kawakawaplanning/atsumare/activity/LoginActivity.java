@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare;
+package com.kawakawaplanning.atsumare.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 
 import butterknife.Bind;
@@ -37,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     public Button mLoginUpBtn;
 
     private Vibrator mVib;
-    private SharedPreferences pref;
+    private SharedPreferences mPref;
     private SharedPreferences.Editor editor;
     private ProgressDialog waitDialog;
 
@@ -48,17 +49,17 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mVib = (Vibrator) getSystemService (VIBRATOR_SERVICE);
-        pref = getSharedPreferences("loginpref", Activity.MODE_PRIVATE );
+        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE );
 
         tutorial();
 
-        if(pref.getBoolean("loginnow",false)) {
+        if(mPref.getBoolean("loginNow",false)) {
             Intent intent = new Intent();
-            intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
+            intent.setClass(this, MapsActivity.class);
             startActivity(intent);
         }else{
-            if(pref.getBoolean("AutoLogin", false)) {
-                login("自動ログイン", pref.getString("username", ""), pref.getString("password", ""));
+            if(mPref.getBoolean("AutoLogin", false)) {
+                login("自動ログイン", mPref.getString("username", ""), mPref.getString("password", ""));
             }
         }
 
@@ -104,15 +105,15 @@ public class LoginActivity extends AppCompatActivity {
         httpConnector.setOnHttpResponseListener((String message) -> {
             waitDialog.dismiss();
             if(Integer.parseInt(message) == 0){
-                editor = pref.edit();
-                editor.putString("loginid", mIdEt.getText().toString());
+                editor = mPref.edit();
+                editor.putString("loginId", mIdEt.getText().toString());
                 editor.apply();
                 Intent intent = new Intent();
                 intent.setClass(LoginActivity.this, GroupActivity.class);
                 startActivity(intent);
 
                 if (mAutoCb.isChecked()) {
-                    editor = pref.edit();
+                    editor = mPref.edit();
                     editor.putString("username", mIdEt.getText().toString());
                     editor.putString("password", mPwEt.getText().toString());
                     editor.putBoolean("AutoLogin", true);

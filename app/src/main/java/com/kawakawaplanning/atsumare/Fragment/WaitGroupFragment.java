@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare.Fragment;
+package com.kawakawaplanning.atsumare.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kawakawaplanning.atsumare.R;
+import com.kawakawaplanning.atsumare.activity.MapsActivity;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 import com.kawakawaplanning.atsumare.list.WaitMemberAdapter;
 import com.kawakawaplanning.atsumare.list.WaitMemberData;
@@ -31,6 +32,7 @@ import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by KP on 15/12/19.
@@ -49,6 +51,9 @@ public class WaitGroupFragment  extends Fragment {
     private WaitMemberAdapter mWaitMemberAdapter;
     private List<WaitMemberData> mWmdList;
 
+    private Bitmap mSuccessImage;
+    private Bitmap mErrorImage;
+
     public static final String TAG = "WaitGroupFragment";
 
     @Override
@@ -62,9 +67,12 @@ public class WaitGroupFragment  extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPref = getActivity().getSharedPreferences("loginmPref", Activity.MODE_PRIVATE);
+        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
         mHandler = new Handler();
         mWmdList = new ArrayList<>();
+
+        mSuccessImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
+        mErrorImage   = BitmapFactory.decodeResource(getResources(), R.drawable.error);
 
         mTimer = null;
         mTimer = new Timer();
@@ -92,14 +100,11 @@ public class WaitGroupFragment  extends Fragment {
         mTimer.cancel();
     }
 
-    public void firstCheck(String mGroupId){
-        HttpConnector httpConnector = new HttpConnector("loginstate","{\"group_id\":\"" + mGroupId + "\"}");
+    public void firstCheck(String mGroupId) {
+        HttpConnector httpConnector = new HttpConnector("loginstate", "{\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
 
-            if(isDetached() || getActivity() == null)return;
-
-            Bitmap successImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
-            Bitmap errorImage = BitmapFactory.decodeResource(getResources(), R.drawable.error);
+            if (isDetached() || getActivity() == null) return;
 
             try {
                 JSONObject json = new JSONObject(message);
@@ -110,29 +115,29 @@ public class WaitGroupFragment  extends Fragment {
 
                     JSONObject object = data.getJSONObject(i);
                     WaitMemberData item = new WaitMemberData();
-                    if(object.getString("login_now").equals(mGroupId) || object.getString("user_id").equals(mMyId)) {
-                        item.setImagaData(successImage);
+                    if (object.getString("login_now").equals(mGroupId) || object.getString("user_id").equals(mMyId)) {
+                        item.setImagaData(mSuccessImage);
                     } else {
-                        item.setImagaData(errorImage);
-                        flag=false;
+                        item.setImagaData(mErrorImage);
+                        flag = false;
                     }
 
                     item.setTextData(object.getString("user_name") + "(" + object.getString("user_id") + ")");
                     mWmdList.add(item);
+                    item = null;
                 }
-                mWaitMemberAdapter = new WaitMemberAdapter(getActivity(),0, mWmdList);
-                mWaitLv.setAdapter(mWaitMemberAdapter);//変更部分
-                if(json.getInt("using") == 0 || flag){
-                    HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
-                    http.post();
+                mWaitMemberAdapter = new WaitMemberAdapter(getActivity(), 0, mWmdList);
+                mWaitLv.setAdapter(mWaitMemberAdapter);
+                if (json.getInt("using") == 0 || flag) {//すでに始めてるorエラーじゃなければ
+                    new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}").post();
 
                     Intent intent = new Intent();
-                    intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-                    mPref.edit().putString("mGroupId",mGroupId).apply();
-                    mPref.edit().putString("loginid",mMyId).apply();
-                    Log.v("kp", mGroupId);
+                    intent.setClass(getActivity(), MapsActivity.class);
+                    mPref.edit().putString("groupId", mGroupId).apply();
+                    mPref.edit().putString("loginId", mMyId).apply();
+                    Log.v(TAG, mGroupId);
                     startActivity(intent);
-                }else{
+                } else {
                     TimerTask task = new TimerTask() {
                         public void run() {
                             mHandler.post(() -> loginCheck(mGroupId));
@@ -140,7 +145,7 @@ public class WaitGroupFragment  extends Fragment {
                     };
                     try {
                         mTimer.schedule(task, 0, 1000);
-                    }catch (IllegalStateException e){
+                    } catch (IllegalStateException e) {
                         e.printStackTrace();
                     }
                 }
@@ -166,25 +171,23 @@ public class WaitGroupFragment  extends Fragment {
         Log.v(TAG,"onDestroyView");
     }
 
+    @OnClick(R.id.startBtn)
     public void start(View v){
         HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
         http.post();
         mTimer.cancel();
         Intent intent = new Intent();
-        intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-        mPref.edit().putString("mGroupId",mGroupId).apply();
-        mPref.edit().putString("loginid",mMyId).apply();
+        intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.atsumare.activity.MapsActivity");
+        mPref.edit().putString("groupId",mGroupId).apply();
+        mPref.edit().putString("loginId",mMyId).apply();
         startActivity(intent);
     }
 
-    public void loginCheck(String mGroupId){
-        HttpConnector httpConnector = new HttpConnector("loginstate","{\"group_id\":\"" + mGroupId + "\"}");
+    public void loginCheck(String mGroupId) {
+        HttpConnector httpConnector = new HttpConnector("loginstate", "{\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
 
-            if(isDetached() || getActivity() == null)return;
-
-            Bitmap successImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
-            Bitmap errorImage = BitmapFactory.decodeResource(getResources(), R.drawable.error);
+            if (isDetached() || getActivity() == null) return;
 
             try {
                 JSONObject json = new JSONObject(message);
@@ -195,25 +198,25 @@ public class WaitGroupFragment  extends Fragment {
 
                     JSONObject object = data.getJSONObject(i);
                     WaitMemberData wmd = mWaitMemberAdapter.getItem(i);
-                    if(object.getString("login_now").equals(mGroupId)) {
-                        wmd.setImagaData(successImage);
+                    if (object.getString("login_now").equals(mGroupId)) {
+                        wmd.setImagaData(mSuccessImage);
 
                     } else {
-                        wmd.setImagaData(errorImage);
-                        flag=false;
+                        wmd.setImagaData(mErrorImage);
+                        flag = false;
                     }
 
                     mWmdList.set(i, wmd);
                 }
-                if(json.getInt("using") == 0 || flag){
-                    HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
+                if (json.getInt("using") == 0 || flag) {
+                    HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
                     http.post();
 
                     mTimer.cancel();
                     Intent intent = new Intent();
-                    intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-                    mPref.edit().putString("mGroupId",mGroupId).apply();
-                    mPref.edit().putString("loginid",mMyId).apply();
+                    intent.setClass(getActivity(), MapsActivity.class);
+                    mPref.edit().putString("groupId", mGroupId).apply();
+                    mPref.edit().putString("loginId", mMyId).apply();
                     startActivity(intent);
                 }
 

@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare.Fragment;
+package com.kawakawaplanning.atsumare.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -70,8 +70,8 @@ public class SelectGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPref = getActivity().getSharedPreferences("loginpref", Activity.MODE_PRIVATE);
-        mMyId = mPref.getString("loginid", "");
+        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
+        mMyId = mPref.getString("loginId", "");
         mHandler = new Handler();
 
     }

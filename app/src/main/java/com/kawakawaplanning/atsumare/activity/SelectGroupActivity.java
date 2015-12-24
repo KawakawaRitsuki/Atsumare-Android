@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare;
+package com.kawakawaplanning.atsumare.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,6 +22,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 import com.kawakawaplanning.atsumare.list.WaitMemberAdapter;
 import com.kawakawaplanning.atsumare.list.WaitMemberData;
@@ -54,8 +55,8 @@ public class SelectGroupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pref = getSharedPreferences("loginpref", Activity.MODE_MULTI_PROCESS);
-        myId = pref.getString("loginid", "");
+        pref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
+        myId = pref.getString("loginId", "");
         mHandler = new Handler();
     }
 

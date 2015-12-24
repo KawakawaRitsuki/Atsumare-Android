@@ -14,7 +14,7 @@
 
             <fragment android:layout_width="match_parent"
                 android:layout_height="match_parent" android:id="@+id/map"
-                tools:context="com.kawakawaplanning.gpsdetag.MapsActivity"
+                tools:context="com.kawakawaplanning.atsumare.activity.MapsActivity"
                 android:name="com.google.android.gms.maps.SupportMapFragment" />
 
             <Button

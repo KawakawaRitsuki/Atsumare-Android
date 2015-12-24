@@ -1,4 +1,4 @@
-package com.kawakawaplanning.atsumare;
+package com.kawakawaplanning.atsumare.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
+
+import com.kawakawaplanning.atsumare.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
