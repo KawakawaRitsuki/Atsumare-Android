@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,7 +22,7 @@
         <service
             android:name=".SendService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -37,20 +38,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".activity.CallBackActivity" android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="Callback" />
-            </intent-filter>
-        </activity>
-
         <activity android:name=".activity.LoginActivity" />
         <activity android:name=".activity.SelectGroupActivity" />
         <activity android:name=".activity.GroupActivity" />
         <activity android:name=".activity.MapsActivity" />
+
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="81d3359502772e5911bd72319039578847ffbbcd" />
+
     </application>
 
 </manifest>

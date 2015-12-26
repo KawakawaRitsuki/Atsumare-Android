@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.OnClick;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
@@ -214,6 +215,7 @@ public class SelectGroupActivity extends AppCompatActivity {
         }
     };
 
+    @OnClick(R.id.makeGroupBtn)
     public void makeGroup(View v){
         android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(
