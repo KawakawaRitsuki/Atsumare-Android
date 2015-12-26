@@ -8,98 +8,119 @@
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ユーザーID"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="8dp"/>
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="ユーザーID"-->
+        <!--android:textColor="@color/brown"-->
+        <!--android:layout_marginBottom="8dp"/>-->
 
-    <EditText
-        android:id="@+id/idEt"
+    <!--<EditText-->
+        <!--android:id="@+id/idEt"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:inputType="text"-->
+        <!--android:textColor="@color/brown"-->
+        <!--android:layout_marginBottom="8dp">-->
+
+        <!--<requestFocus />-->
+    <!--</EditText>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="パスワード"-->
+        <!--android:textColor="@color/brown"-->
+        <!--android:layout_marginBottom="8dp"/>-->
+
+    <!--<EditText-->
+        <!--android:id="@+id/pwEt"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:inputType="text|textPassword"-->
+        <!--android:textColor="@color/brown"-->
+        <!--android:layout_marginBottom="8dp"/>-->
+
+    <!--<CheckBox-->
+        <!--android:id="@+id/autoCb"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:checked="false"-->
+        <!--android:text="自動ログイン"-->
+        <!--android:textColor="@color/brown"-->
+        <!--android:layout_marginBottom="16dp"/>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/signUpBtn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@drawable/button"-->
+            <!--android:text="新規会員登録"-->
+            <!--android:textColor="@color/brown"-->
+            <!--android:layout_marginBottom="8dp"/>-->
+
+        <!--<Space-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/loginBtn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="right"-->
+            <!--android:background="@drawable/button"-->
+            <!--android:text="ログイン"-->
+            <!--android:textColor="@color/brown"-->
+            <!--android:layout_marginBottom="8dp"/>-->
+    <!--</LinearLayout>-->
+
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="8dp">
-
-        <requestFocus />
-    </EditText>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="パスワード"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="8dp"/>
-
-    <EditText
-        android:id="@+id/pwEt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text|textPassword"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="8dp"/>
-
-    <CheckBox
-        android:id="@+id/autoCb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:checked="false"
-        android:text="自動ログイン"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:src="@drawable/bee"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/signUpBtn"
-            android:layout_width="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button"
-            android:text="新規会員登録"
+            android:layout_weight="1"
+            android:text="集まれ！"
+            android:id="@+id/atsumare"
+            android:textSize="@android:dimen/app_icon_size"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
             android:textColor="@color/brown"
-            android:layout_marginBottom="8dp"/>
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/loginBtn"
-            android:layout_width="wrap_content"
+        <com.twitter.sdk.android.core.identity.TwitterLoginButton
+            android:id="@+id/twitter_login_button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:background="@drawable/button"
-            android:text="ログイン"
-            android:textColor="@color/brown"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            />
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/facebook_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"/>
     </LinearLayout>
-
-
-    <com.twitter.sdk.android.core.identity.TwitterLoginButton
-        android:id="@+id/twitter_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        />
-
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/facebook_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"/>
-
 
 </LinearLayout>
