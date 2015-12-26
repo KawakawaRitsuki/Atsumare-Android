@@ -44,20 +44,20 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class SelectGroupActivity extends AppCompatActivity {
 
-    private String myId;
-    private String groupId;
+    private String mMyId;
+    private String mGroupId;
     private ListView mSelectLv;
     private ListView mWaitLv;
-    private ProgressDialog waitDialog;
+    private ProgressDialog mWaitDialog;
     private Handler mHandler;
-    SharedPreferences pref;
+    SharedPreferences mPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
-        myId = pref.getString("loginId", "");
+        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
+        mMyId = mPref.getString("loginId", "");
         mHandler = new Handler();
     }
 
@@ -84,7 +84,7 @@ public class SelectGroupActivity extends AppCompatActivity {
         adb.setTitle("確認");
         adb.setMessage("ログアウトしますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
-            SharedPreferences.Editor editor = pref.edit();
+            SharedPreferences.Editor editor = mPref.edit();
             editor.putString("username", "");
             editor.putString("password", "");
             editor.putBoolean("AutoLogin", false);
@@ -101,9 +101,9 @@ public class SelectGroupActivity extends AppCompatActivity {
         Wait("グループ読み込み");
         list = new ArrayList<>();
 
-        HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + myId + "\"}");
+        HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + mMyId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
-            waitDialog.dismiss();
+            mWaitDialog.dismiss();
             try {
                 if (!message.equals("notfound")) {
                     JSONObject json = new JSONObject(message);
@@ -128,7 +128,7 @@ public class SelectGroupActivity extends AppCompatActivity {
             });
         });
         httpConnector.setOnHttpErrorListener((int error) -> {
-            waitDialog.dismiss();
+            mWaitDialog.dismiss();
             android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(SelectGroupActivity.this);
             adb.setTitle("接続エラー");
             adb.setMessage("接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
@@ -149,7 +149,7 @@ public class SelectGroupActivity extends AppCompatActivity {
                     logout(null);
                     break;
                 case R.layout.fragment_group_wait:
-                    HttpConnector httpConnector = new HttpConnector("grouplogin", "{\"user_id\":\"" + myId + "\",\"group_id\":\"\"}");
+                    HttpConnector httpConnector = new HttpConnector("grouplogin", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"\"}");
                     httpConnector.setOnHttpResponseListener((String message) -> {
                         if (Integer.parseInt(message) == 1) {
                             Toast.makeText(SelectGroupActivity.this, "サーバーエラーが発生しました。時間を開けてお試しください。", Toast.LENGTH_SHORT).show();
@@ -169,7 +169,7 @@ public class SelectGroupActivity extends AppCompatActivity {
 
     private AdapterView.OnItemClickListener onItem = (AdapterView<?> parent, View view, int position, long id) -> {
         Map<String, String> map = (Map<String, String>) parent.getAdapter().getItem(position);
-        groupId = map.get("Member").substring(7);
+        mGroupId = map.get("Member").substring(7);
         setScreenContent(R.layout.fragment_group_wait);
     };
 
@@ -186,10 +186,10 @@ public class SelectGroupActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     Wait("処理");
                     Map<String, String> map = (Map<String, String>) parent.getAdapter().getItem(position);
-                    HttpConnector httpConnector = new HttpConnector("outgroup", "{\"user_id\":\"" + myId + "\",\"group_id\":\"" + map.get("Member").substring(7) + "\"}");
+                    HttpConnector httpConnector = new HttpConnector("outgroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + map.get("Member").substring(7) + "\"}");
                     httpConnector.setOnHttpResponseListener((String message) -> {
                         Log.v("tag", message);
-                        waitDialog.dismiss();
+                        mWaitDialog.dismiss();
                         if (Integer.parseInt(message) == 0) {
                             Toast.makeText(getApplicationContext(), "削除しました", Toast.LENGTH_SHORT).show();
                         } else {
@@ -198,7 +198,7 @@ public class SelectGroupActivity extends AppCompatActivity {
                         listLoad();
                     });
                     httpConnector.setOnHttpErrorListener((int error) -> {
-                        waitDialog.dismiss();
+                        mWaitDialog.dismiss();
                         android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(SelectGroupActivity.this);
                         adb.setTitle("接続エラー");
                         adb.setMessage("接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
@@ -233,7 +233,7 @@ public class SelectGroupActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("OK",(DialogInterface dialog, int which) -> {
             final String str = et1.getEditableText().toString();
             if (!str.isEmpty()) {
-                HttpConnector httpConnector = new HttpConnector("makegroup","{\"user_id\":\""+myId+"\",\"group_name\":\""+str+"\"}");
+                HttpConnector httpConnector = new HttpConnector("makegroup","{\"user_id\":\""+ mMyId +"\",\"group_name\":\""+str+"\"}");
                 httpConnector.setOnHttpResponseListener((String message) -> {
                     android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(SelectGroupActivity.this);
                     adb.setCancelable(true);
@@ -281,11 +281,11 @@ public class SelectGroupActivity extends AppCompatActivity {
             if (!str.isEmpty()) {
                 Wait("グループ検索");
 
-                HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + myId + "\"}");
+                HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + mMyId + "\"}");
                 httpConnector.setOnHttpResponseListener((String jsonData) -> {
 
                     if (!jsonData.equals("notfound")) {
-                        waitDialog.dismiss();
+                        mWaitDialog.dismiss();
                         try {
                             JSONObject json = new JSONObject(jsonData);
                             JSONArray data = json.getJSONArray("data");
@@ -298,7 +298,7 @@ public class SelectGroupActivity extends AppCompatActivity {
                                 }
                             }
                             if (flag) {
-                                HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + myId + "\",\"group_id\":\"" + str + "\"}");
+                                HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + str + "\"}");
                                 httpCon.setOnHttpResponseListener((String message) -> {
                                     if (Integer.parseInt(message) == 0) {
                                         android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(SelectGroupActivity.this);
@@ -338,8 +338,8 @@ public class SelectGroupActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     } else {
-                        waitDialog.dismiss();
-                        HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + myId + "\",\"group_id\":\"" + str + "\"}");
+                        mWaitDialog.dismiss();
+                        HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + str + "\"}");
                         httpCon.setOnHttpResponseListener((String message) -> {
                             if (Integer.parseInt(message) == 0) {
                                 android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(SelectGroupActivity.this);
@@ -386,11 +386,11 @@ public class SelectGroupActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
     private void Wait(String what){
-        waitDialog = new ProgressDialog(this);
-        waitDialog.setMessage(what + "中...");
-        waitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        waitDialog.setCanceledOnTouchOutside(false);
-        waitDialog.show();
+        mWaitDialog = new ProgressDialog(this);
+        mWaitDialog.setMessage(what + "中...");
+        mWaitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mWaitDialog.setCanceledOnTouchOutside(false);
+        mWaitDialog.show();
     }
 
     int mScreenId = 0;
@@ -432,11 +432,11 @@ public class SelectGroupActivity extends AppCompatActivity {
 
         mWaitLv.setAdapter(customAdapter);
 
-        mHandler.post(() -> firstCheck(groupId));
+        mHandler.post(() -> firstCheck(mGroupId));
 
 
 
-        HttpConnector httpConnector = new HttpConnector("grouplogin","{\"user_id\":\""+myId+"\",\"group_id\":\""+groupId+"\"}");
+        HttpConnector httpConnector = new HttpConnector("grouplogin","{\"user_id\":\""+ mMyId +"\",\"group_id\":\""+ mGroupId +"\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
             if (Integer.parseInt(message) == 1) {
                 Toast.makeText(SelectGroupActivity.this, "サーバーエラーが発生しました。時間を開けてお試しください。", Toast.LENGTH_SHORT).show();
@@ -461,7 +461,7 @@ public class SelectGroupActivity extends AppCompatActivity {
 
                     JSONObject object = data.getJSONObject(i);
                     WaitMemberData item = new WaitMemberData();
-                    if(object.getString("login_now").equals(groupId) || object.getString("user_id").equals(myId)) {
+                    if(object.getString("login_now").equals(groupId) || object.getString("user_id").equals(mMyId)) {
                         item.setImagaData(successImage);
                     } else {
                         item.setImagaData(errorImage);
@@ -479,8 +479,8 @@ public class SelectGroupActivity extends AppCompatActivity {
 
                     Intent intent = new Intent();
                     intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-                    pref.edit().putString("groupId",groupId).apply();
-                    pref.edit().putString("loginid",myId).apply();
+                    mPref.edit().putString("groupId",groupId).apply();
+                    mPref.edit().putString("loginid", mMyId).apply();
                     Log.v("kp",groupId);
                     startActivity(intent);
                 }else{
@@ -505,13 +505,13 @@ public class SelectGroupActivity extends AppCompatActivity {
     }
 
     public void start(View v){
-        HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + groupId + "\",\"using\":0}");
+        HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
         http.post();
         mTimer.cancel();
         Intent intent = new Intent();
         intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-        pref.edit().putString("groupId",groupId).apply();
-        pref.edit().putString("loginid",myId).apply();
+        mPref.edit().putString("groupId", mGroupId).apply();
+        mPref.edit().putString("loginid", mMyId).apply();
         startActivity(intent);
     }
 
@@ -547,8 +547,8 @@ public class SelectGroupActivity extends AppCompatActivity {
                     mTimer.cancel();
                     Intent intent = new Intent();
                     intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.gpsdetag.MapsActivity");
-                    pref.edit().putString("groupId",groupId).apply();
-                    pref.edit().putString("loginid",myId).apply();
+                    mPref.edit().putString("groupId",groupId).apply();
+                    mPref.edit().putString("loginid", mMyId).apply();
                     startActivity(intent);
                 }
 

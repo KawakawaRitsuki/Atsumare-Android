@@ -40,4 +40,8 @@ public class MainApplication extends Application {
         MultiDex.install(this);
     }
 
+    public void test(){
+
+    }
+
 }

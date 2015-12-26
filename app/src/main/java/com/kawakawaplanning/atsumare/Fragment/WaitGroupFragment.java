@@ -37,7 +37,7 @@ import butterknife.OnClick;
 /**
  * Created by KP on 15/12/19.
  */
-public class WaitGroupFragment  extends Fragment {
+public class WaitGroupFragment extends Fragment {
 
     @Bind(R.id.waitLv)
     public ListView mWaitLv;
@@ -72,12 +72,12 @@ public class WaitGroupFragment  extends Fragment {
         mWmdList = new ArrayList<>();
 
         mSuccessImage = BitmapFactory.decodeResource(getResources(), R.drawable.success);
-        mErrorImage   = BitmapFactory.decodeResource(getResources(), R.drawable.error);
+        mErrorImage = BitmapFactory.decodeResource(getResources(), R.drawable.error);
 
         mTimer = null;
         mTimer = new Timer();
 
-        if(mWaitMemberAdapter != null) {
+        if (mWaitMemberAdapter != null) {
             mWaitMemberAdapter.clear();
             mWaitMemberAdapter.notifyDataSetChanged();
             mWaitLv.setAdapter(mWaitMemberAdapter);
@@ -85,7 +85,7 @@ public class WaitGroupFragment  extends Fragment {
 
         mHandler.post(() -> firstCheck(mGroupId));
 
-        HttpConnector httpConnector = new HttpConnector("grouplogin","{\"user_id\":\""+mMyId+"\",\"group_id\":\""+mGroupId+"\"}");
+        HttpConnector httpConnector = new HttpConnector("grouplogin", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
             if (Integer.parseInt(message) == 1) {
                 Toast.makeText(getActivity(), "サーバーエラーが発生しました。時間を開けてお試しください。", Toast.LENGTH_SHORT).show();
@@ -158,7 +158,7 @@ public class WaitGroupFragment  extends Fragment {
         httpConnector.post();
     }
 
-    public static Fragment newInstance(String groupId,String myId) {
+    public static Fragment newInstance(String groupId, String myId) {
         WaitGroupFragment fragment = new WaitGroupFragment();
         fragment.mGroupId = groupId;
         fragment.mMyId = myId;
@@ -168,18 +168,18 @@ public class WaitGroupFragment  extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.v(TAG,"onDestroyView");
+        Log.v(TAG, "onDestroyView");
     }
 
     @OnClick(R.id.startBtn)
-    public void start(View v){
-        HttpConnector http = new HttpConnector("setusing","{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
+    public void start(View v) {
+        HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
         http.post();
         mTimer.cancel();
         Intent intent = new Intent();
         intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.atsumare.activity.MapsActivity");
-        mPref.edit().putString("groupId",mGroupId).apply();
-        mPref.edit().putString("loginId",mMyId).apply();
+        mPref.edit().putString("groupId", mGroupId).apply();
+        mPref.edit().putString("loginId", mMyId).apply();
         startActivity(intent);
     }
 
