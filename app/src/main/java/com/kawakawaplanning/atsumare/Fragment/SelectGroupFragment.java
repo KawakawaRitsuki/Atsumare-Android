@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.facebook.login.LoginManager;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 
@@ -90,6 +91,10 @@ public class SelectGroupFragment extends Fragment {
         adb.setMessage("ログアウトしますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
             SharedPreferences.Editor editor = mPref.edit();
+
+            
+            LoginManager.getInstance().logOut();
+
             editor.putString("username", "");
             editor.putString("password", "");
             editor.putBoolean("AutoLogin", false);

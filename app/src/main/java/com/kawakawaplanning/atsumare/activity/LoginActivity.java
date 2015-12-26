@@ -106,13 +106,13 @@ public class LoginActivity extends AppCompatActivity {
                             final String str = et1.getEditableText().toString();
                             if (!str.isEmpty()) {
                                 waitDig("登録");
-                                HttpConnector httpConnector1 = new HttpConnector("signup", "{\"user_id\":\"" +"fb_" + loginResult.getAccessToken().getUserId()+ "\",\"password\":\"\",\"user_name\":\"" + et1.getText().toString() + "\"}");
+                                HttpConnector httpConnector1 = new HttpConnector("signup", "{\"user_id\":\"" + "fb_" + loginResult.getAccessToken().getUserId() + "\",\"password\":\"\",\"user_name\":\"" + et1.getText().toString() + "\"}");
                                 httpConnector1.setOnHttpResponseListener((String message) -> {
                                     waitDialog.dismiss();
 
                                     alert("登録完了", "会員登録が完了しました！OKボタンを押してはじめよう！", (DialogInterface d, int w) -> {
                                         editor = mPref.edit();
-                                        editor.putString("loginId","fb_" + loginResult.getAccessToken().getUserId());
+                                        editor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
                                         editor.apply();
                                         Intent intent = new Intent();
                                         intent.setClass(LoginActivity.this, GroupActivity.class);
@@ -137,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
                 httpConnector.post();
-        }
+            }
 
             @Override
             public void onCancel() {
@@ -149,6 +149,8 @@ public class LoginActivity extends AppCompatActivity {
                 // App code
             }
         });
+
+
 
         mTwitterLoginBtn.setCallback(new Callback<TwitterSession>() {
             @Override
