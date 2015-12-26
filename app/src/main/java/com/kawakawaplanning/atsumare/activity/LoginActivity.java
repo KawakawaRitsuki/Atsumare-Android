@@ -55,8 +55,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private Vibrator mVib;
     private SharedPreferences mPref;
-    private SharedPreferences.Editor editor;
-    private ProgressDialog waitDialog;
+    private SharedPreferences.Editor mEditor;
+    private ProgressDialog mWaitDialog;
     private CallbackManager mCallbackManager;
 
     @Override
@@ -83,9 +83,9 @@ public class LoginActivity extends AppCompatActivity {
                 HttpConnector httpConnector = new HttpConnector("twittercheck", "{\"user_id\":\"" + "fb_" + loginResult.getAccessToken().getUserId() + "\"}");
                 httpConnector.setOnHttpResponseListener((String response) -> {
                     if (response.equals("0")) {
-                        editor = mPref.edit();
-                        editor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
-                        editor.apply();
+                        mEditor = mPref.edit();
+                        mEditor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
+                        mEditor.apply();
                         Intent intent = new Intent();
                         intent.setClass(LoginActivity.this, GroupActivity.class);
                         startActivity(intent);
@@ -108,19 +108,19 @@ public class LoginActivity extends AppCompatActivity {
                                 waitDig("登録");
                                 HttpConnector httpConnector1 = new HttpConnector("signup", "{\"user_id\":\"" + "fb_" + loginResult.getAccessToken().getUserId() + "\",\"password\":\"\",\"user_name\":\"" + et1.getText().toString() + "\"}");
                                 httpConnector1.setOnHttpResponseListener((String message) -> {
-                                    waitDialog.dismiss();
+                                    mWaitDialog.dismiss();
 
                                     alert("登録完了", "会員登録が完了しました！OKボタンを押してはじめよう！", (DialogInterface d, int w) -> {
-                                        editor = mPref.edit();
-                                        editor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
-                                        editor.apply();
+                                        mEditor = mPref.edit();
+                                        mEditor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
+                                        mEditor.apply();
                                         Intent intent = new Intent();
                                         intent.setClass(LoginActivity.this, GroupActivity.class);
                                         startActivity(intent);
                                     });
                                 });
                                 httpConnector1.setOnHttpErrorListener((int error) -> {
-                                    waitDialog.dismiss();
+                                    mWaitDialog.dismiss();
                                     android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(getApplicationContext());
                                     adb.setTitle("接続エラー");
                                     adb.setMessage("接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
@@ -155,16 +155,16 @@ public class LoginActivity extends AppCompatActivity {
         mTwitterLoginBtn.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                waitDialog.cancel();
+                mWaitDialog.cancel();
                 Log.v("kp", result.data.getAuthToken().token);
                 Log.v("kp", result.data.getAuthToken().secret);
                 Log.v("kp", result.data.getUserName());
                 HttpConnector httpConnector = new HttpConnector("twittercheck", "{\"user_id\":\"" + "tw_" + result.data.getUserName() + "\"}");
                 httpConnector.setOnHttpResponseListener((String response) -> {
                     if (response.equals("0")) {
-                        editor = mPref.edit();
-                        editor.putString("loginId", "tw_" + result.data.getUserName());
-                        editor.apply();
+                        mEditor = mPref.edit();
+                        mEditor.putString("loginId", "tw_" + result.data.getUserName());
+                        mEditor.apply();
                         Intent intent = new Intent();
                         intent.setClass(LoginActivity.this, GroupActivity.class);
                         startActivity(intent);
@@ -187,19 +187,19 @@ public class LoginActivity extends AppCompatActivity {
                                 waitDig("登録");
                                 HttpConnector httpConnector1 = new HttpConnector("signup", "{\"user_id\":\"" + "tw_" + result.data.getUserName() + "\",\"password\":\"\",\"user_name\":\"" + et1.getText().toString() + "\"}");
                                 httpConnector1.setOnHttpResponseListener((String message) -> {
-                                    waitDialog.dismiss();
+                                    mWaitDialog.dismiss();
 
                                     alert("登録完了", "会員登録が完了しました！OKボタンを押してはじめよう！", (DialogInterface d, int w) -> {
-                                        editor = mPref.edit();
-                                        editor.putString("loginId", "tw_" + result.data.getUserName());
-                                        editor.apply();
+                                        mEditor = mPref.edit();
+                                        mEditor.putString("loginId", "tw_" + result.data.getUserName());
+                                        mEditor.apply();
                                         Intent intent = new Intent();
                                         intent.setClass(LoginActivity.this, GroupActivity.class);
                                         startActivity(intent);
                                     });
                                 });
                                 httpConnector1.setOnHttpErrorListener((int error) -> {
-                                    waitDialog.dismiss();
+                                    mWaitDialog.dismiss();
                                     android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(getApplicationContext());
                                     adb.setTitle("接続エラー");
                                     adb.setMessage("接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
@@ -220,7 +220,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void failure(TwitterException exception) {
-                waitDialog.cancel();
+                mWaitDialog.cancel();
                 Log.v("kp", "errored!");
                 exception.printStackTrace();
                 // Do something on failure
@@ -323,11 +323,11 @@ public class LoginActivity extends AppCompatActivity {
 //    }
 
     private void waitDig(String what){
-        waitDialog = new ProgressDialog(this);
-        waitDialog.setMessage(what + "中...");
-        waitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        waitDialog.setCanceledOnTouchOutside(false);
-        waitDialog.show();
+        mWaitDialog = new ProgressDialog(this);
+        mWaitDialog.setMessage(what + "中...");
+        mWaitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mWaitDialog.setCanceledOnTouchOutside(false);
+        mWaitDialog.show();
     }
     private void alert(String til,String msg,DialogInterface.OnClickListener onclick){
         AlertDialog.Builder adb = new AlertDialog.Builder(LoginActivity.this);

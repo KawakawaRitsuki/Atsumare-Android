@@ -57,10 +57,10 @@ public class MapsActivity extends FragmentActivity {
     SharedPreferences mPref;
 
 
-    boolean finish = false;
+    boolean mFinish = false;
 
-    ListView listLv;
-    ImageView listIv;
+    ListView mListLv;
+    ImageView mListIv;
 
 
     @Override
@@ -68,12 +68,12 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        listLv = (ListView)findViewById(R.id.listView3);
-        listIv = (ImageView)findViewById(R.id.chatCloseBtn);
+        mListLv = (ListView)findViewById(R.id.listView3);
+        mListIv = (ImageView)findViewById(R.id.chatCloseBtn);
 
-        listIv.setOnClickListener((v) -> {
-            listIv.setVisibility(View.INVISIBLE);
-            listLv.setVisibility(View.INVISIBLE);
+        mListIv.setOnClickListener((v) -> {
+            mListIv.setVisibility(View.INVISIBLE);
+            mListLv.setVisibility(View.INVISIBLE);
         });
 
         mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
@@ -95,8 +95,8 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void chatBtn(View v){
-        listIv.setVisibility(View.VISIBLE);
-        listLv.setVisibility(View.VISIBLE);
+        mListIv.setVisibility(View.VISIBLE);
+        mListLv.setVisibility(View.VISIBLE);
         HttpConnector httpConnector = new HttpConnector("logincheck", "{\"group_id\":\"" + mGroupId + "\"}");
         httpConnector.setOnHttpResponseListener((message) -> {
             try {
@@ -117,7 +117,7 @@ public class MapsActivity extends FragmentActivity {
                     objects.add(item);
                 }
                 MapsMemberAdapter memberAdapter = new MapsMemberAdapter(this,0,objects);
-                listLv.setAdapter(memberAdapter);//変更部分
+                mListLv.setAdapter(memberAdapter);//変更部分
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -132,7 +132,7 @@ public class MapsActivity extends FragmentActivity {
         adb.setTitle("確認");
         adb.setMessage("終了しますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
-            finish = true;
+            mFinish = true;
             HttpConnector httpConnector = new HttpConnector("grouplogout", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + mGroupId + "\"}");
             httpConnector.setOnHttpResponseListener((String message) -> {
                 Log.v("kp", "Message:" + message);
@@ -266,7 +266,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void notification(){
-        if(!finish) {
+        if(!mFinish) {
 
             PendingIntent contentIntent = PendingIntent.getActivity(this, 1, new Intent(this, MapsActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
