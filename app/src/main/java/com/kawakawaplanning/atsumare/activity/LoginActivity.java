@@ -70,8 +70,6 @@ public class LoginActivity extends AppCompatActivity {
         mVib = (Vibrator) getSystemService (VIBRATOR_SERVICE);
         mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE );
 
-        
-
         mTwitterLoginBtn.setOnClickListener((View v) -> waitDig("ログイン"));
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLoginBtn.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {

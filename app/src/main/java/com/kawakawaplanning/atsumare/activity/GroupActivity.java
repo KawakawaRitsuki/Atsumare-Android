@@ -20,7 +20,7 @@ public class GroupActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         SelectGroupFragment fragment1 = new SelectGroupFragment();
-        fragmentTransaction.replace(android.R.id.content, fragment1);
+        fragmentTransaction.replace(R.id.FrameLayout, fragment1);
 
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         fragmentTransaction.commit();

@@ -2,6 +2,8 @@ package com.kawakawaplanning.atsumare.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -136,7 +138,18 @@ public class WaitGroupFragment extends Fragment {
                     mPref.edit().putString("groupId", mGroupId).apply();
                     mPref.edit().putString("loginId", mMyId).apply();
                     Log.v(TAG, mGroupId);
+
                     startActivity(intent);
+
+                    getActivity().getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    FragmentManager fragmentManager = getActivity().getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.addToBackStack(null);
+
+                    Fragment fragment1 = new SelectGroupFragment();
+                    fragmentTransaction.replace(android.R.id.content, fragment1);
+                    fragmentTransaction.commit();
                 } else {
                     TimerTask task = new TimerTask() {
                         public void run() {
@@ -177,10 +190,21 @@ public class WaitGroupFragment extends Fragment {
         http.post();
         mTimer.cancel();
         Intent intent = new Intent();
-        intent.setClassName("com.kawakawaplanning.gpsdetag", "com.kawakawaplanning.atsumare.activity.MapsActivity");
+        intent.setClassName("com.kawakawaplanning.atsumare", "com.kawakawaplanning.atsumare.activity.MapsActivity");
         mPref.edit().putString("groupId", mGroupId).apply();
         mPref.edit().putString("loginId", mMyId).apply();
+
         startActivity(intent);
+
+        getActivity().getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        FragmentManager fragmentManager = getActivity().getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+
+        Fragment fragment1 = new SelectGroupFragment();
+        fragmentTransaction.replace(android.R.id.content, fragment1);
+        fragmentTransaction.commit();
     }
 
     public void loginCheck(String mGroupId) {
