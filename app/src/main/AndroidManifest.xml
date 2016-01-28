@@ -40,7 +40,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.SelectGroupActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.GroupActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.MapsActivity" android:screenOrientation="portrait"/>
 

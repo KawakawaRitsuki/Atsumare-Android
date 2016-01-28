@@ -1,13 +1,11 @@
 package com.kawakawaplanning.atsumare.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,6 +20,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
+import com.kawakawaplanning.atsumare.MainApplication;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 
@@ -49,10 +48,9 @@ public class SelectGroupFragment extends Fragment {
     @Bind(R.id.groupLv)
     public ListView mGroupLv;
 
-    private SharedPreferences mPref;
-    private String mMyId;
     private Handler mHandler;
-    private ProgressDialog mWaitDialog; 
+    private ProgressDialog mWaitDialog;
+    private MainApplication application;
 
 
     public SelectGroupFragment() {
@@ -71,8 +69,7 @@ public class SelectGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
-        mMyId = mPref.getString("loginId", "");
+        application = (MainApplication) getActivity().getApplication();
         mHandler = new Handler();
 
     }
@@ -90,15 +87,7 @@ public class SelectGroupFragment extends Fragment {
         adb.setTitle("確認");
         adb.setMessage("ログアウトしますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
-            SharedPreferences.Editor editor = mPref.edit();
-
-            
             LoginManager.getInstance().logOut();
-
-            editor.putString("username", "");
-            editor.putString("password", "");
-            editor.putBoolean("AutoLogin", false);
-            editor.apply();
             getActivity().finish();
         });
         adb.setNegativeButton("Cancel", null);
@@ -122,7 +111,7 @@ public class SelectGroupFragment extends Fragment {
         alertDialogBuilder.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
             final String str = et1.getEditableText().toString();
             if (!str.isEmpty()) {
-                HttpConnector httpConnector = new HttpConnector("makegroup", "{\"user_id\":\"" + mMyId + "\",\"group_name\":\"" + str + "\"}");
+                HttpConnector httpConnector = new HttpConnector("makegroup", "{\"user_id\":\"" + application.getMyId() + "\",\"group_name\":\"" + str + "\"}");
                 httpConnector.setOnHttpResponseListener((String message) -> {
                     showAlert("グループ作成完了", "グループの作成が完了しました。友達を早速誘おう！グループIDは「" + message + "」です。");
                     listLoad();
@@ -141,7 +130,9 @@ public class SelectGroupFragment extends Fragment {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(null);
 
-        Fragment fragment1 = WaitGroupFragment.newInstance(map.get("Member").substring(7),mMyId);
+        application.setCurrentFragment(1);
+        application.setGroupId(map.get("Member").substring(7));
+        Fragment fragment1 = new WaitGroupFragment();
         fragmentTransaction.replace(android.R.id.content, fragment1);
         fragmentTransaction.commit();
     };
@@ -154,7 +145,7 @@ public class SelectGroupFragment extends Fragment {
             adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
                     showWait("処理");
                     Map<String, String> map = (Map<String, String>) parent.getAdapter().getItem(position);
-                    HttpConnector httpConnector = new HttpConnector("outgroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + map.get("Member").substring(7) + "\"}");
+                    HttpConnector httpConnector = new HttpConnector("outgroup", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + map.get("Member").substring(7) + "\"}");
                     httpConnector.setOnHttpResponseListener((String message) -> {
                         Log.v("tag", message);
                         mWaitDialog.dismiss();
@@ -197,7 +188,7 @@ public class SelectGroupFragment extends Fragment {
             if (!str.isEmpty()) {
                 showWait("グループ検索");
 
-                HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + mMyId + "\"}");
+                HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + application.getMyId() + "\"}");
                 httpConnector.setOnHttpResponseListener((String jsonData) -> {
 
                     if (!jsonData.equals("notfound")) {
@@ -214,7 +205,7 @@ public class SelectGroupFragment extends Fragment {
                                 }
                             }
                             if (flag) {
-                                HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + str + "\"}");
+                                HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + str + "\"}");
                                 httpCon.setOnHttpResponseListener((String message) -> {
                                     if (Integer.parseInt(message) == 0) {
                                         showAlert("グループ参加", "グループに参加しました。早速グループを選択して遊ぼう！");
@@ -233,7 +224,7 @@ public class SelectGroupFragment extends Fragment {
                         }
                     } else {
                         mWaitDialog.dismiss();
-                        HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + str + "\"}");
+                        HttpConnector httpCon = new HttpConnector("ingroup", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + str + "\"}");
                         httpCon.setOnHttpResponseListener((String message) -> {
                             if (Integer.parseInt(message) == 0) {
                                 showAlert("グループ参加", "グループに参加しました。さっそくグループを選択して遊ぼう！");
@@ -261,7 +252,7 @@ public class SelectGroupFragment extends Fragment {
         showWait("グループ読み込み");
         list = new ArrayList<>();
 
-        HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + mMyId + "\"}");
+        HttpConnector httpConnector = new HttpConnector("getgroup", "{\"user_id\":\"" + application.getMyId() + "\"}");
         httpConnector.setOnHttpResponseListener((String message) -> {
             mWaitDialog.dismiss();
             try {

@@ -1,11 +1,9 @@
 package com.kawakawaplanning.atsumare.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -15,8 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.kawakawaplanning.atsumare.MainApplication;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.activity.MapsActivity;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
@@ -44,11 +42,7 @@ public class WaitGroupFragment extends Fragment {
     @Bind(R.id.waitLv)
     public ListView mWaitLv;
 
-    private String mGroupId;
-    private String mMyId;
-
     private Handler mHandler;
-    private SharedPreferences mPref;
     private Timer mTimer;
     private WaitMemberAdapter mWaitMemberAdapter;
     private List<WaitMemberData> mWmdList;
@@ -56,6 +50,7 @@ public class WaitGroupFragment extends Fragment {
     private Bitmap mSuccessImage;
     private Bitmap mErrorImage;
 
+    private MainApplication application;
     public static final String TAG = "WaitGroupFragment";
 
     @Override
@@ -68,8 +63,9 @@ public class WaitGroupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        application = (MainApplication) getActivity().getApplication();
 
-        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
+//        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
         mHandler = new Handler();
         mWmdList = new ArrayList<>();
 
@@ -85,15 +81,9 @@ public class WaitGroupFragment extends Fragment {
             mWaitLv.setAdapter(mWaitMemberAdapter);
         }
 
-        mHandler.post(() -> firstCheck(mGroupId));
+        mHandler.post(() -> firstCheck(application.getGroupId()));
 
-        HttpConnector httpConnector = new HttpConnector("grouplogin", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + mGroupId + "\"}");
-        httpConnector.setOnHttpResponseListener((String message) -> {
-            if (Integer.parseInt(message) == 1) {
-                Toast.makeText(getActivity(), "サーバーエラーが発生しました。時間を開けてお試しください。", Toast.LENGTH_SHORT).show();
-            }
-        });
-        httpConnector.post();
+        new HttpConnector("grouplogin", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + application.getGroupId() + "\"}").post();
     }
 
     @Override
@@ -117,7 +107,7 @@ public class WaitGroupFragment extends Fragment {
 
                     JSONObject object = data.getJSONObject(i);
                     WaitMemberData item = new WaitMemberData();
-                    if (object.getString("login_now").equals(mGroupId) || object.getString("user_id").equals(mMyId)) {
+                    if (object.getString("login_now").equals(mGroupId) || object.getString("user_id").equals(application.getMyId())) {
                         item.setImagaData(mSuccessImage);
                     } else {
                         item.setImagaData(mErrorImage);
@@ -135,8 +125,6 @@ public class WaitGroupFragment extends Fragment {
 
                     Intent intent = new Intent();
                     intent.setClass(getActivity(), MapsActivity.class);
-                    mPref.edit().putString("groupId", mGroupId).apply();
-                    mPref.edit().putString("loginId", mMyId).apply();
                     Log.v(TAG, mGroupId);
 
                     startActivity(intent);
@@ -171,13 +159,6 @@ public class WaitGroupFragment extends Fragment {
         httpConnector.post();
     }
 
-    public static Fragment newInstance(String groupId, String myId) {
-        WaitGroupFragment fragment = new WaitGroupFragment();
-        fragment.mGroupId = groupId;
-        fragment.mMyId = myId;
-        return fragment;
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -186,13 +167,11 @@ public class WaitGroupFragment extends Fragment {
 
     @OnClick(R.id.startBtn)
     public void start(View v) {
-        HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
+        HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + application.getGroupId() + "\",\"using\":0}");
         http.post();
         mTimer.cancel();
         Intent intent = new Intent();
         intent.setClassName("com.kawakawaplanning.atsumare", "com.kawakawaplanning.atsumare.activity.MapsActivity");
-        mPref.edit().putString("groupId", mGroupId).apply();
-        mPref.edit().putString("loginId", mMyId).apply();
 
         startActivity(intent);
 
@@ -239,8 +218,6 @@ public class WaitGroupFragment extends Fragment {
                     mTimer.cancel();
                     Intent intent = new Intent();
                     intent.setClass(getActivity(), MapsActivity.class);
-                    mPref.edit().putString("groupId", mGroupId).apply();
-                    mPref.edit().putString("loginId", mMyId).apply();
                     startActivity(intent);
                 }
 

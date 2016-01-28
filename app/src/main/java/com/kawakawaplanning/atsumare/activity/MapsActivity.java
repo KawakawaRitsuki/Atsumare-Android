@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.kawakawaplanning.atsumare.MainApplication;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.SendService;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
@@ -48,13 +49,12 @@ import java.util.TimerTask;
 public class MapsActivity extends FragmentActivity {
 
     static public GoogleMap mGoogleMap;
-    static public String mMyId;
-    private String mGroupId;
     private Handler mHandler;
     private Map<Integer, Marker> mMarker= new HashMap<>();
     Timer mTimer;
     private NotificationManager mNm;
     SharedPreferences mPref;
+private MainApplication application;
 
 
     boolean mFinish = false;
@@ -68,6 +68,7 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        application = (MainApplication) this.getApplication();
         mListLv = (ListView)findViewById(R.id.listView3);
         mListIv = (ImageView)findViewById(R.id.chatCloseBtn);
 
@@ -77,8 +78,6 @@ public class MapsActivity extends FragmentActivity {
         });
 
         mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
-        mMyId = mPref.getString("loginId", "");
-        mGroupId = mPref.getString("groupId", "");
 
         SharedPreferences.Editor editor = mPref.edit();
         editor.putBoolean("loginNow", true);
@@ -97,7 +96,7 @@ public class MapsActivity extends FragmentActivity {
     public void chatBtn(View v){
         mListIv.setVisibility(View.VISIBLE);
         mListLv.setVisibility(View.VISIBLE);
-        HttpConnector httpConnector = new HttpConnector("logincheck", "{\"group_id\":\"" + mGroupId + "\"}");
+        HttpConnector httpConnector = new HttpConnector("logincheck", "{\"group_id\":\"" + application.getGroupId() + "\"}");
         httpConnector.setOnHttpResponseListener((message) -> {
             try {
                 JSONObject json = new JSONObject(message);
@@ -133,11 +132,11 @@ public class MapsActivity extends FragmentActivity {
         adb.setMessage("終了しますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
             mFinish = true;
-            HttpConnector httpConnector = new HttpConnector("grouplogout", "{\"user_id\":\"" + mMyId + "\",\"group_id\":\"" + mGroupId + "\"}");
+            HttpConnector httpConnector = new HttpConnector("grouplogout", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + application.getGroupId() + "\"}");
             httpConnector.setOnHttpResponseListener((String message) -> {
                 Log.v("kp", "Message:" + message);
                 if (message.equals("1")) {
-                    HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":1}");
+                    HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + application.getGroupId() + "\",\"using\":1}");
                     http.post();
                 }
                 SharedPreferences.Editor editor = mPref.edit();
@@ -186,7 +185,6 @@ public class MapsActivity extends FragmentActivity {
         int nId = R.string.app_name;
         mNm.cancel(nId);
         mNm.cancel(nId + 1);
-        mMyId = mPref.getString("loginId", "");
     }
 
     public boolean isServiceRunning(Context c, Class<?> cls) {
@@ -209,7 +207,7 @@ public class MapsActivity extends FragmentActivity {
 
     public void getLocate(){
         mHandler.post(() -> {
-            HttpConnector httpConnector = new HttpConnector("getlocate", "{\"group_id\":\"" + mGroupId + "\"}");
+            HttpConnector httpConnector = new HttpConnector("getlocate", "{\"group_id\":\"" + application.getGroupId() + "\"}");
             httpConnector.setOnHttpResponseListener((String message) -> {
                 Log.v("kp", message);
                 try {
@@ -262,7 +260,6 @@ public class MapsActivity extends FragmentActivity {
         super.onStop();
         mTimer.cancel();
         notification();
-        mMyId = null;
     }
 
     public void notification(){

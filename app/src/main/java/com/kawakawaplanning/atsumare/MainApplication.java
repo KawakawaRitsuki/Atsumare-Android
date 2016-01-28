@@ -19,6 +19,12 @@ public class MainApplication extends Application {
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "358zlvIfDNu4RnrXNJMC47mZr";
     private static final String TWITTER_SECRET = "VL9FQkVpttzcIPxifChjabwnqTXIcvtYKI9hul3hNQNfDkS69O";
+    private int currentFragment = 0;
+    //0 = select
+    //1 = wait
+
+    private String MyId;
+    private String GroupId;
 
     @Override
     public void onCreate() {
@@ -45,4 +51,28 @@ public class MainApplication extends Application {
 
     }
 
+
+    public int getCurrentFragment() {
+        return currentFragment;
+    }
+
+    public void setCurrentFragment(int currentFragment) {
+        this.currentFragment = currentFragment;
+    }
+
+    public String getGroupId() {
+        return GroupId;
+    }
+
+    public void setGroupId(String groupId) {
+        GroupId = groupId;
+    }
+
+    public String getMyId() {
+        return MyId;
+    }
+
+    public void setMyId(String myId) {
+        MyId = myId;
+    }
 }

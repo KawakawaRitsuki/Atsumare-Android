@@ -22,6 +22,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.kawakawaplanning.atsumare.MainApplication;
 import com.kawakawaplanning.atsumare.R;
 import com.kawakawaplanning.atsumare.http.HttpConnector;
 import com.twitter.sdk.android.core.Callback;
@@ -55,9 +56,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private Vibrator mVib;
     private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
     private ProgressDialog mWaitDialog;
     private CallbackManager mCallbackManager;
+    private MainApplication application;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,25 +66,25 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        application = (MainApplication) this.getApplication();
+
+        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE );
         mAtsumareTv.setTypeface(Typeface.createFromAsset(getAssets(), "mplus1cthin.ttf"));
 
         mVib = (Vibrator) getSystemService (VIBRATOR_SERVICE);
-        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE );
 
         mTwitterLoginBtn.setOnClickListener((View v) -> waitDig("ログイン"));
         mCallbackManager = CallbackManager.Factory.create();
         mFacebookLoginBtn.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
-                Log.v("kp", loginResult.getAccessToken().getToken());
-                Log.v("kp", loginResult.getAccessToken().getUserId());
+
                 HttpConnector httpConnector = new HttpConnector("twittercheck", "{\"user_id\":\"" + "fb_" + loginResult.getAccessToken().getUserId() + "\"}");
                 httpConnector.setOnHttpResponseListener((String response) -> {
                     if (response.equals("0")) {
-                        mEditor = mPref.edit();
-                        mEditor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
-                        mEditor.apply();
+
+                        application.setMyId( "fb_" + loginResult.getAccessToken().getUserId());
+
                         Intent intent = new Intent();
                         intent.setClass(LoginActivity.this, GroupActivity.class);
                         startActivity(intent);
@@ -109,9 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                                     mWaitDialog.dismiss();
 
                                     alert("登録完了", "会員登録が完了しました！OKボタンを押してはじめよう！", (DialogInterface d, int w) -> {
-                                        mEditor = mPref.edit();
-                                        mEditor.putString("loginId", "fb_" + loginResult.getAccessToken().getUserId());
-                                        mEditor.apply();
+                                        application.setMyId("fb_" + loginResult.getAccessToken().getUserId());
                                         Intent intent = new Intent();
                                         intent.setClass(LoginActivity.this, GroupActivity.class);
                                         startActivity(intent);
@@ -160,9 +159,7 @@ public class LoginActivity extends AppCompatActivity {
                 HttpConnector httpConnector = new HttpConnector("twittercheck", "{\"user_id\":\"" + "tw_" + result.data.getUserName() + "\"}");
                 httpConnector.setOnHttpResponseListener((String response) -> {
                     if (response.equals("0")) {
-                        mEditor = mPref.edit();
-                        mEditor.putString("loginId", "tw_" + result.data.getUserName());
-                        mEditor.apply();
+                        application.setMyId( "tw_" + result.data.getUserName());
                         Intent intent = new Intent();
                         intent.setClass(LoginActivity.this, GroupActivity.class);
                         startActivity(intent);
@@ -188,9 +185,7 @@ public class LoginActivity extends AppCompatActivity {
                                     mWaitDialog.dismiss();
 
                                     alert("登録完了", "会員登録が完了しました！OKボタンを押してはじめよう！", (DialogInterface d, int w) -> {
-                                        mEditor = mPref.edit();
-                                        mEditor.putString("loginId", "tw_" + result.data.getUserName());
-                                        mEditor.apply();
+                                        application.setMyId( "tw_" + result.data.getUserName());
                                         Intent intent = new Intent();
                                         intent.setClass(LoginActivity.this, GroupActivity.class);
                                         startActivity(intent);
@@ -231,19 +226,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent();
             intent.setClass(this, MapsActivity.class);
             startActivity(intent);
-        }else{
-            if(mPref.getBoolean("AutoLogin", false)) {
-//                login("自動ログイン", mPref.getString("username", ""), mPref.getString("password", ""));
-            }
         }
-
-//        mPwEt.setOnKeyListener((View v, int keyCode, KeyEvent event) -> {
-//            if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-//                login("ログイン", mIdEt.getText().toString(), mPwEt.getText().toString());
-//                return true;
-//            }
-//            return false;
-//        });
     }
 
     @Override

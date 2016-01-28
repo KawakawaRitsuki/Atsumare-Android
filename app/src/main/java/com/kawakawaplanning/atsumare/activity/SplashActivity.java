@@ -26,7 +26,6 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
-
         mTitleTv.setTypeface(Typeface.createFromAsset(getAssets(), "mplus1cthin.ttf"));
         mTitleTv.setTextColor(ContextCompat.getColor(this, R.color.yellow));
 
