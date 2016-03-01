@@ -53,10 +53,13 @@ public class WaitGroupFragment extends Fragment {
     private MainApplication application;
     public static final String TAG = "WaitGroupFragment";
 
+    private boolean usedIntent = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_group_wait, container, false);
         ButterKnife.bind(this, v);
+        application.setmIsClick(false);
         return v;
     }
 
@@ -64,6 +67,7 @@ public class WaitGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         application = (MainApplication) getActivity().getApplication();
+
 
 //        mPref = getActivity().getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
         mHandler = new Handler();
@@ -82,13 +86,24 @@ public class WaitGroupFragment extends Fragment {
         }
 
         mHandler.post(() -> firstCheck(application.getGroupId()));
+    }
 
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
         new HttpConnector("grouplogin", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + application.getGroupId() + "\"}").post();
+        Log.v("kp", "onStart");
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.v("kp", "onStop");
+        if(!usedIntent){
+            new HttpConnector("grouplogout", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + application.getGroupId() + "\"}").post();
+        }
         mTimer.cancel();
     }
 
@@ -122,6 +137,8 @@ public class WaitGroupFragment extends Fragment {
                 mWaitLv.setAdapter(mWaitMemberAdapter);
                 if (json.getInt("using") == 0 || flag) {//すでに始めてるorエラーじゃなければ
                     new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}").post();
+
+                    usedIntent = true;
 
                     Intent intent = new Intent();
                     intent.setClass(getActivity(), MapsActivity.class);
@@ -167,6 +184,7 @@ public class WaitGroupFragment extends Fragment {
 
     @OnClick(R.id.startBtn)
     public void start(View v) {
+        usedIntent = true;
         HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + application.getGroupId() + "\",\"using\":0}");
         http.post();
         mTimer.cancel();
@@ -212,13 +230,24 @@ public class WaitGroupFragment extends Fragment {
                     mWmdList.set(i, wmd);
                 }
                 if (json.getInt("using") == 0 || flag) {
-                    HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + mGroupId + "\",\"using\":0}");
+                    usedIntent = true;
+                    HttpConnector http = new HttpConnector("setusing", "{\"group_id\":\"" + application.getGroupId() + "\",\"using\":0}");
                     http.post();
-
                     mTimer.cancel();
                     Intent intent = new Intent();
-                    intent.setClass(getActivity(), MapsActivity.class);
+                    intent.setClassName("com.kawakawaplanning.atsumare", "com.kawakawaplanning.atsumare.activity.MapsActivity");
+
                     startActivity(intent);
+
+                    getActivity().getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    FragmentManager fragmentManager = getActivity().getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.addToBackStack(null);
+
+                    Fragment fragment1 = new SelectGroupFragment();
+                    fragmentTransaction.replace(android.R.id.content, fragment1);
+                    fragmentTransaction.commit();
                 }
 
             } catch (JSONException e) {

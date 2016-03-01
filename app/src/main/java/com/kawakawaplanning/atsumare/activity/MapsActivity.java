@@ -54,7 +54,7 @@ public class MapsActivity extends FragmentActivity {
     Timer mTimer;
     private NotificationManager mNm;
     SharedPreferences mPref;
-private MainApplication application;
+    private MainApplication application;
 
 
     boolean mFinish = false;
@@ -68,7 +68,13 @@ private MainApplication application;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+
         application = (MainApplication) this.getApplication();
+        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
+        if(mPref.getBoolean("loginNow",false)){
+            application.loadPref();
+        }
+
         mListLv = (ListView)findViewById(R.id.listView3);
         mListIv = (ImageView)findViewById(R.id.chatCloseBtn);
 
@@ -77,14 +83,14 @@ private MainApplication application;
             mListLv.setVisibility(View.INVISIBLE);
         });
 
-        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
-
         SharedPreferences.Editor editor = mPref.edit();
         editor.putBoolean("loginNow", true);
         editor.apply();
 
         mHandler = new Handler();
         mGoogleMap =  ( (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map) ).getMap();
+
+        new HttpConnector("grouplogin", "{\"user_id\":\"" + application.getMyId() + "\",\"group_id\":\"" + application.getGroupId() + "\"}").post();
 
         mapInit();
 

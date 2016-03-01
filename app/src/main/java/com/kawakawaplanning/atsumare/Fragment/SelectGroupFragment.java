@@ -72,6 +72,8 @@ public class SelectGroupFragment extends Fragment {
         application = (MainApplication) getActivity().getApplication();
         mHandler = new Handler();
 
+        LoginManager.getInstance().logOut();
+
     }
 
     @Override
@@ -87,7 +89,7 @@ public class SelectGroupFragment extends Fragment {
         adb.setTitle("確認");
         adb.setMessage("ログアウトしますか？");
         adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
-            LoginManager.getInstance().logOut();
+            application.init();
             getActivity().finish();
         });
         adb.setNegativeButton("Cancel", null);
@@ -125,6 +127,12 @@ public class SelectGroupFragment extends Fragment {
     }
 
     private AdapterView.OnItemClickListener onItem = (AdapterView<?> parent, View view, int position, long id) -> {
+
+        if(application.getmIsClick()) return;
+        application.setmIsClick(true);
+
+        Log.v("kp","clicked");
+
         Map<String, String> map = (Map<String, String>) parent.getAdapter().getItem(position);
         FragmentManager fragmentManager = getActivity().getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -139,7 +147,7 @@ public class SelectGroupFragment extends Fragment {
 
     private AdapterView.OnItemLongClickListener onItemLong = (final AdapterView<?> parent, View view, final int position, long id) -> {
             android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(getActivity());
-            adb.setCancelable(true);
+        adb.setCancelable(true);
             adb.setTitle("確認");
             adb.setMessage("このグループから退出しますか？");
             adb.setPositiveButton("OK", (DialogInterface dialog, int which) -> {
@@ -166,6 +174,8 @@ public class SelectGroupFragment extends Fragment {
             adb.show();
             return true;
     };
+
+
 
     @OnClick(R.id.inGroupBtn)
     public void inGroup(View v){
@@ -261,7 +271,7 @@ public class SelectGroupFragment extends Fragment {
                     JSONArray data = json.getJSONArray("data");
 
                     for (int i = 0; i != data.length(); i++) {
-                        JSONObject object = data.getJSONObject(i);//ノットファウンド
+                        JSONObject object = data.getJSONObject(i);
                         Map<String, String> conMap = new HashMap<>();
                         conMap.put("Name", object.getString("group_name"));
                         conMap.put("Member", "グループID:" + object.getString("group_id"));
@@ -279,8 +289,8 @@ public class SelectGroupFragment extends Fragment {
             });
         });
         httpConnector.setOnHttpErrorListener((int error) -> {
-            mWaitDialog.dismiss();
-            showAlert("接続エラー","接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
+//            mWaitDialog.dismiss();
+//            showAlert("接続エラー","接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
         });
         httpConnector.post();
     }

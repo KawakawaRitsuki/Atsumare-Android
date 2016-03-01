@@ -12,48 +12,37 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <application
-        android:name=".MainApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
+    <!-- Required to act as a custom watch face. -->
+    <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
 
-        android:theme="@style/AppTheme">
-        <service
-            android:name=".SendService"
-            android:enabled="true"
-            android:exported="true" />
+    <application android:name=".MainApplication" android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher" android:label="@string/app_name"
+        android:supportsRtl="true" android:theme="@style/AppTheme">
+        <service android:name=".SendService" android:enabled="true" android:exported="true" />
 
-        <meta-data
-            android:name="com.google.android.gms.version"
+        <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBKQg1X3BepUE4czgVm22k2VvYVnBVJiWE" />
 
-        <activity android:name=".activity.SplashActivity" android:screenOrientation="portrait">
+        <activity android:name=".activity.SplashActivity" android:screenOrientation="portrait" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.GroupActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.MapsActivity" android:screenOrientation="portrait"/>
-
+        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".activity.GroupActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".activity.MapsActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".activity.OSLActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
         <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
+        <meta-data android:name="io.fabric.ApiKey"
             android:value="81d3359502772e5911bd72319039578847ffbbcd" />
-
     </application>
 
 </manifest>

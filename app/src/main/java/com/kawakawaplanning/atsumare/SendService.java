@@ -34,26 +34,25 @@ public class SendService extends Service implements LocationListener {
 
     private LocationManager locationManager;
 
-    static public String myId;
-    static public String groupId;
     Timer mTimer;
 
     HashMap<String, Integer> mMap;
     NotificationManager mNm;
 
+       SharedPreferences pref;
+
     @Override
     public void onCreate() {
         Log.v("kp","test");
 
+
         mMap = new HashMap<>();
-        SharedPreferences pref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
-        myId = pref.getString("loginId", "");
+        pref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
 
         mNm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this); // 位置情報リスナー
-        groupId = pref.getString("groupId", "");
 
         mTimer = new Timer();
         mTimer.schedule(
@@ -99,13 +98,13 @@ public class SendService extends Service implements LocationListener {
     public void sendLocate(final double lat ,final double lon){
 
         if (lat != 0.0) {
-            HttpConnector httpConnector = new HttpConnector("regist","{\"user_id\":\"" + myId + "\",\"latitude\":\"" + lat + "\",\"longitude\":\"" + lon + "\"}");
+            HttpConnector httpConnector = new HttpConnector("regist","{\"user_id\":\"" + pref.getString("MyId", "") + "\",\"latitude\":\"" + lat + "\",\"longitude\":\"" + lon + "\"}");
             httpConnector.post();
         }
     }
 
     public void loginCheck() {
-        HttpConnector httpConnector = new HttpConnector("logincheck","{\"group_id\":\"" + groupId + "\"}");
+        HttpConnector httpConnector = new HttpConnector("logincheck","{\"group_id\":\"" + pref.getString("GroupId","") + "\"}");
         httpConnector.setOnHttpResponseListener((response) -> {
             try {
                 JSONObject json = new JSONObject(response);
@@ -114,7 +113,7 @@ public class SendService extends Service implements LocationListener {
                 for (int i = 0; i != data.length(); i++) {
                     JSONObject object = data.getJSONObject(i);
                     if (mMap.containsKey(object.getString("user_id"))) {
-                        if (!object.getString("user_id").equals(myId) && mMap.get(object.getString("user_id")) != object.getInt("login")) {
+                        if (!object.getString("user_id").equals(pref.getString("MyId", "")) && mMap.get(object.getString("user_id")) != object.getInt("login")) {
                             if (object.getInt("login") == 1)
                                 notification(object.getString("user_name"), "ログアウト");
                             else

@@ -12,6 +12,8 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -67,6 +69,8 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         application = (MainApplication) this.getApplication();
+
+        application.init();
 
         mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE );
         mAtsumareTv.setTypeface(Typeface.createFromAsset(getAssets(), "mplus1cthin.ttf"));
@@ -153,9 +157,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void success(Result<TwitterSession> result) {
                 mWaitDialog.cancel();
-                Log.v("kp", result.data.getAuthToken().token);
-                Log.v("kp", result.data.getAuthToken().secret);
-                Log.v("kp", result.data.getUserName());
                 HttpConnector httpConnector = new HttpConnector("twittercheck", "{\"user_id\":\"" + "tw_" + result.data.getUserName() + "\"}");
                 httpConnector.setOnHttpResponseListener((String response) -> {
                     if (response.equals("0")) {
@@ -238,70 +239,23 @@ public class LoginActivity extends AppCompatActivity {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-//    private void tutorial(){
-//        ShowcaseConfig config = new ShowcaseConfig();
-//        config.setDelay(500);
-//        config.setMaskColor(ContextCompat.getColor(this, R.color.showcase_back));
-//        config.setContentTextColor(ContextCompat.getColor(this, R.color.showcase_text));
-//        config.setDismissTextColor(ContextCompat.getColor(this, R.color.showcase_text));
-//
-//        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, "login");
-//        sequence.setConfig(config);
-//        sequence.addSequenceItem(findViewById(R.id.signUpBtn), "まずは会員登録をしましょう！", "次へ");
-//        sequence.addSequenceItem(findViewById(R.id.loginBtn), "登録ができたら早速ログイン！", "次へ");
-//        sequence.start();
-//    }
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuItem item = menu.add(0,0,0,"オープンソースライセンス");
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setIcon(R.drawable.ic_info_outline_black_24dp);
+        return true;
+    }
 
-//    @OnClick(R.id.signUpBtn)
-//    public void signUpBtn() {
-//        mVib.vibrate(50);
-//
-//    }
-//
-//    @OnClick(R.id.loginBtn)
-//    public void loginBtn() {
-//        mVib.vibrate(50);
-//        login("ログイン", mIdEt.getText().toString(), mPwEt.getText().toString());
-//    }
-//
-//    private void login(String msg,String id,String pw){
-//        waitDig(msg);
-//
-//        HttpConnector httpConnector = new HttpConnector("login","{\"user_id\":\"" + id + "\",\"password\":\"" + pw + "\"}");
-//        httpConnector.setOnHttpResponseListener((String message) -> {
-//            waitDialog.dismiss();
-//            if(Integer.parseInt(message) == 0){
-//                editor = mPref.edit();
-//                editor.putString("loginId", mIdEt.getText().toString());
-//                editor.apply();
-//                Intent intent = new Intent();
-//                intent.setClass(LoginActivity.this, GroupActivity.class);
-//                startActivity(intent);
-//
-//                if (mAutoCb.isChecked()) {
-//                    editor = mPref.edit();
-//                    editor.putString("username", mIdEt.getText().toString());
-//                    editor.putString("password", mPwEt.getText().toString());
-//                    editor.putBoolean("AutoLogin", true);
-//                    editor.apply();
-//                }
-//            }else{
-//                alert("ログインエラー","IDまたはパスワードが違います。もう一度試してください。エラーコード:1",null);
-//            }
-//
-//
-//        });
-//        httpConnector.setOnHttpErrorListener((int error) -> {
-//            waitDialog.dismiss();
-//            android.support.v7.app.AlertDialog.Builder adb = new android.support.v7.app.AlertDialog.Builder(LoginActivity.this);
-//            adb.setTitle("接続エラー");
-//            adb.setMessage("接続エラーが発生しました。インターネットの接続状態を確認して下さい。");
-//            adb.setPositiveButton("OK", null);
-//            adb.setCancelable(true);
-//            adb.show();
-//        });
-//        httpConnector.post();
-//    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 0:
+                Intent i = new Intent();
+                i.setClass(this,OSLActivity.class);
+                startActivity(i);
+                return true;
+        }
+        return false;
+    }
 
     private void waitDig(String what){
         mWaitDialog = new ProgressDialog(this);

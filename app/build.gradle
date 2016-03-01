@@ -28,11 +28,14 @@ android {
 
     defaultConfig {
         applicationId "com.kawakawaplanning.atsumare"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "0.1a"
+        versionName "1.0a"
         multiDexEnabled true
+    }
+    dexOptions {
+        incremental true
     }
     buildTypes {
         release {
@@ -50,16 +53,17 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.google.android.gms:play-services:8.3.0'
-    compile 'com.github.deano2390:MaterialShowcaseView:1.0.5'
-    compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.android.gms:play-services:8.3.0'
+
+    compile 'com.github.deano2390:MaterialShowcaseView:1.0.5'
     compile 'com.github.scribejava:scribejava-apis:2.0.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile('com.twitter.sdk.android:twitter:1.11.0@aar') {
         transitive = true;
     }
-    compile 'com.android.support:multidex:1.0.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }

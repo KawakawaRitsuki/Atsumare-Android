@@ -1,7 +1,9 @@
 package com.kawakawaplanning.atsumare;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
@@ -19,12 +21,16 @@ public class MainApplication extends Application {
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "358zlvIfDNu4RnrXNJMC47mZr";
     private static final String TWITTER_SECRET = "VL9FQkVpttzcIPxifChjabwnqTXIcvtYKI9hul3hNQNfDkS69O";
+
     private int currentFragment = 0;
     //0 = select
     //1 = wait
 
     private String MyId;
     private String GroupId;
+    private Boolean mIsClick;
+
+    private SharedPreferences mPref;
 
     @Override
     public void onCreate() {
@@ -34,11 +40,7 @@ public class MainApplication extends Application {
         FacebookSdk.sdkInitialize(this);
         FacebookSdk.setApplicationId("711390698997001");
         FacebookSdk.setApplicationName("集まれ！");
-    }
-    @Override
-    public void onTerminate() {
-        //終了時
-        super.onTerminate();
+        mPref = getSharedPreferences("loginPref", Activity.MODE_PRIVATE);
     }
 
     @Override
@@ -47,10 +49,24 @@ public class MainApplication extends Application {
         MultiDex.install(this);
     }
 
-    public void test(){
-
+    public void init(){
+        currentFragment = 0;
+        MyId = "";
+        GroupId = "";
+        mIsClick = false;
     }
 
+    public void savePref(){
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putString("MyId", MyId);
+        editor.putString("GroupId", GroupId);
+        editor.apply();
+    }
+
+    public void loadPref(){
+        MyId = mPref.getString("MyId","");
+        GroupId = mPref.getString("GroupId","");
+    }
 
     public int getCurrentFragment() {
         return currentFragment;
@@ -66,6 +82,7 @@ public class MainApplication extends Application {
 
     public void setGroupId(String groupId) {
         GroupId = groupId;
+        savePref();
     }
 
     public String getMyId() {
@@ -74,5 +91,14 @@ public class MainApplication extends Application {
 
     public void setMyId(String myId) {
         MyId = myId;
+        savePref();
+    }
+
+    public void setmIsClick(Boolean mIsClick) {
+        this.mIsClick = mIsClick;
+    }
+
+    public Boolean getmIsClick() {
+        return mIsClick;
     }
 }
